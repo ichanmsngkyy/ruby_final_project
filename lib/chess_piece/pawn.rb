@@ -12,7 +12,8 @@ class Pawn < Piece
       left_diagonal: [1, -1]
     }
 
-    @color = is_white ? '♙' : '♟'
+    @color = is_white ? 'white' : 'black'
+    @icon = is_white ? '♙' : '♟'
     @position = position
     @has_moved = false
     @double_stepped = false

@@ -10,7 +10,8 @@ class Knight < Piece
       [2, 1], [2, -1], [-2, 1], [-2, -1]
     ]
     @has_moved = false
-    @color = is_white ? '♘' : '♞'
-   super(position, is_white, icon)
+    @color = is_white ? 'white' : 'black'
+    @icon = is_white ? '♘' : '♞'
+    super(position, is_white, icon)
   end
 end
