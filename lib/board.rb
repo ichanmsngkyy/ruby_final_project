@@ -17,7 +17,7 @@ class Board
     @grid = Array.new(DEFAULT_ROWS) { Array.new(DEFAULT_COLS, nil) }
   end
 
-  def setup_piece
+  def setup_pieces
     setup_white
     setup_black
   end
@@ -31,14 +31,7 @@ class Board
     @grid[0][5] = Bishop.new([0, 5], true) # White Rook
     @grid[0][6] = Knight.new([0, 6], true) # White Rook
     @grid[0][7] = Rook.new([0, 7], true) # White Rook
-    @grid[1][0] = Pawn.new([1, 0], true) # White Pawn
-    @grid[1][1] = Pawn.new([1, 1], true) # White Pawn
-    @grid[1][2] = Pawn.new([1, 2], true) # White Pawn
-    @grid[1][3] = Pawn.new([1, 3], true) # White Pawn
-    @grid[1][4] = Pawn.new([1, 4], true) # White Pawn
-    @grid[1][5] = Pawn.new([1, 5], true) # White Pawn
-    @grid[1][6] = Pawn.new([1, 6], true) # White Pawn
-    @grid[1][7] = Pawn.new([1, 7], true) # White Pawn
+    (0..7).each { |col| @grid[1][col] = Pawn.new([6, col], true) } # White Pawn
   end
 
   def setup_black
@@ -50,23 +43,47 @@ class Board
     @grid[7][5] = Bishop.new([7, 5], false) # Black Bishop
     @grid[7][6] = Knight.new([7, 6], false) # Black Knight
     @grid[7][7] = Rook.new([7, 7], false) # Black Rook
-    @grid[6][0] = Pawn.new([6, 0], false) # Black Pawn
-    @grid[6][1] = Pawn.new([6, 1], false) # Black Pawn
-    @grid[6][2] = Pawn.new([6, 2], false) # Black Pawn
-    @grid[6][3] = Pawn.new([6, 3], false) # Black Pawn
-    @grid[6][4] = Pawn.new([6, 4], false) # Black Pawn
-    @grid[6][5] = Pawn.new([6, 5], false) # Black Pawn
-    @grid[6][6] = Pawn.new([6, 6], false) # Black Pawn
-    @grid[6][7] = Pawn.new([6, 7], false) # Black Pawn
+    (0..7).each { |col| @grid[6][col] = Pawn.new([6, col], false) } # Black Pawn
   end
 
   def display_board
-    column_labels = '   A   B   C   D   E   F   G   H'
-    puts column_labels
+    puts '   A   B   C   D   E   F   G   H'
 
-    @grid.each_with_index do |row, index|
-      print "#{(8 - index).to_s.strip} |" # Ensure the number uses only two spaces
-      puts row.map { |square| square.nil? ? ' _ ' : square.icon.center(3) }.join('|') + ' |'
+    @grid.reverse.each_with_index do |row, index|
+      # Since we're reversing, row 8 is index 0, row 7 is index 1, ...
+      row_number = 8 - index
+
+      print "#{row_number} |"
+      row.each do |square|
+        # Print piece icon or underscore for nil squares, centered
+        print square.nil? ? ' _ ' : " #{square.icon} "
+        print '|'
+      end
+      puts ' '
     end
+  end
+
+  def move_piece(start_pos, end_pos)
+    piece = self[start_pos]
+    return false unless piece
+
+    if piece.valid_move?(end_pos, self)
+      self[end_pos] = piece
+      self[start_pos] = nil
+      piece.position = end_pos
+      true
+    else
+      false
+    end
+  end
+
+  def [](pos)
+    row, col = pos
+    @grid[row][col]
+  end
+
+  def []=(pos, value)
+    row, col = pos
+    @grid[row][col] = value
   end
 end

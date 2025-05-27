@@ -21,8 +21,8 @@ describe Board do
     end
   end
 
-  describe '#setup_piece' do
-    before { board.setup_piece }
+  describe '#setup_pieces' do
+    before { board.setup_pieces }
 
     it 'places pieces in correct starting positions' do
       expect(board.instance_variable_get(:@grid)[0][0]).to be_a(Rook)
@@ -51,32 +51,32 @@ describe Board do
     it 'prints the board correctly' do
       expected_output = <<~BOARD
            A   B   C   D   E   F   G   H
-        8 | _ | _ | _ | _ | _ | _ | _ | _  |
-        7 | _ | _ | _ | _ | _ | _ | _ | _  |
-        6 | _ | _ | _ | _ | _ | _ | _ | _  |
-        5 | _ | _ | _ | _ | _ | _ | _ | _  |
-        4 | _ | _ | _ | _ | _ | _ | _ | _  |
-        3 | _ | _ | _ | _ | _ | _ | _ | _  |
-        2 | _ | _ | _ | _ | _ | _ | _ | _  |
-        1 | _ | _ | _ | _ | _ | _ | _ | _  |
+        8 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        7 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        6 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        5 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        4 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        3 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        2 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        1 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
       BOARD
 
       expect { board.display_board }.to output(expected_output).to_stdout
     end
 
     it 'prints a board with pieces after setup' do
-      board.setup_piece
+      board.setup_pieces
 
       expected_output = <<~BOARD
            A   B   C   D   E   F   G   H
-        8 | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖  |
-        7 | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙  |
-        6 | _ | _ | _ | _ | _ | _ | _ | _  |
-        5 | _ | _ | _ | _ | _ | _ | _ | _  |
-        4 | _ | _ | _ | _ | _ | _ | _ | _  |
-        3 | _ | _ | _ | _ | _ | _ | _ | _  |
-        2 | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟  |
-        1 | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜  |
+        8 | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |#{' '}
+        7 | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ |#{' '}
+        6 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        5 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        4 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        3 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
+        2 | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |#{' '}
+        1 | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |#{' '}
       BOARD
 
       expect { board.display_board }.to output(expected_output).to_stdout

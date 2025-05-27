@@ -12,7 +12,7 @@ class King < Piece
     ]
     @has_moved = false
     @color = is_white ? 'white' : 'black'
-    @icon = is_white ? '♔' : '♚'
+    icon = is_white ? '♔' : '♚'
     super(position, is_white, icon)
   end
 
@@ -30,5 +30,20 @@ class King < Piece
     return false if in_check?(positions)
 
     true
+  end
+
+  def valid_move?(end_pos, board)
+    return false unless king_move(end_pos)
+
+    dest_piece = board[end_pos[0]][end_pos[1]]
+    return false if dest_piece && dest_piece.color == color
+
+    true
+  end
+
+  private
+
+  def king_move(end_pos)
+    (end_pos[0] - x).abs <= 1 && (end_pos[1] - y).abs <= 1
   end
 end
