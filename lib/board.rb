@@ -15,6 +15,7 @@ class Board
 
   def initialize
     @grid = Array.new(DEFAULT_ROWS) { Array.new(DEFAULT_COLS, nil) }
+    @last_move = nil
   end
 
   def setup_pieces
@@ -31,7 +32,7 @@ class Board
     @grid[0][5] = Bishop.new([0, 5], true) # White Rook
     @grid[0][6] = Knight.new([0, 6], true) # White Rook
     @grid[0][7] = Rook.new([0, 7], true) # White Rook
-    (0..7).each { |col| @grid[1][col] = Pawn.new([6, col], true) } # White Pawn
+    (0..7).each { |col| @grid[1][col] = Pawn.new([1, col], true) } # White Pawn
   end
 
   def setup_black
@@ -68,9 +69,25 @@ class Board
     return false unless piece
 
     if piece.valid_move?(end_pos, self)
-      self[end_pos] = piece
-      self[start_pos] = nil
-      piece.position = end_pos
+      if piece.is_a?(Pawn) && en_passant_capture(piece, end_pos)
+        perform_en_passant(piece, end_pos)
+      else
+        self[end_pos] = piece
+        self[start_pos] = nil
+        piece.position = end_pos
+      end
+
+      piece.instance_variable_set(:@has_moved, true)
+
+      if piece.is_a?(Pawn)
+        moved_two = (end_pos[0] - start_pos[0]).abs == 2
+        piece.instance_variable_set(:@double_stepped, moved_two)
+      end
+
+      @last_move = { piece: piece, start_pos: start_pos, end_pos: end_pos }
+
+      promote_pawn(piece) if piece.is_a?(Pawn) && promotion_row?(piece)
+
       true
     else
       false
@@ -85,5 +102,55 @@ class Board
   def []=(pos, value)
     row, col = pos
     @grid[row][col] = value
+  end
+
+  private
+
+  def en_passant_capture(pawn, end_pos)
+    dx = end_pos[0] - pawn.position[0]
+    dy = end_pos[1] - pawn.position[1]
+
+    return false unless dx == (pawn.color == 'white' ? -1 : 1) && dy.abs == 1
+    return false unless self[end_pos].nil?
+
+    captured_pawn_pos = [pawn.position[0], end_pos[1]]
+    captured_pawn = self[captured_pawn_pos]
+
+    captured_pawn.is_a?(Pawn) &&
+      captured_pawn.color != pawn.color &&
+      captured_pawn.instance_variable_get(:@double_stepped) &&
+      @last_move &&
+      @last_move[:piece] == captured_pawn &&
+      (@last_move[:start_pos][0] - @last_move[:end_pos][0]).abs == 2
+  end
+
+  def perform_en_passant(pawn, end_pos)
+    captured_pawn_pos = [pawn.position[0], end_pos[1]]
+    self[captured_pawn_pos] = nil
+
+    self[end_pos] = pawn
+    self[pawn.position] = nil
+    pawn.position = end_pos
+  end
+
+  def promotion_row?(pawn)
+    (pawn.color == 'white' && pawn.position[0] == 0) ||
+      (pawn.color == 'black' && pawn.position[0] == 7)
+  end
+
+  def promote_pawn(pawn)
+    puts 'Pawn promotion! Choose (Q)ueen, (R)ook, (B)ishop, or K(N)ight:'
+    choice = gets.chomp.upcase
+
+    promoted_piece = case choice
+                     when 'Q' then Queen.new(pawn.position, pawn.color == 'white')
+                     when 'R' then Rook.new(pawn.position, pawn.color == 'white')
+                     when 'B' then Bishop.new(pawn.position, pawn.color == 'white')
+                     when 'N' then Knight.new(pawn.position, pawn.color == 'white')
+                     else
+                       puts 'Invalid choice, promoting to Queen by default.'
+                       Queen.new(pawn.position, pawn.color == 'white')
+                     end
+    self[pawn.position] = promoted_piece
   end
 end

@@ -15,9 +15,8 @@ describe Board do
 
   describe '#initialize' do
     it 'creates an empty grid' do
-      expected_board = Array.new(8) { Array.new(8, nil) }
-      board_before_setup = Board.new.instance_variable_get(:@grid)
-      expect(board.instance_variable_get(:@grid)).to eq(board_before_setup)
+      before_setup = Board.new.instance_variable_get(:@grid)
+      expect(board.instance_variable_get(:@grid)).to eq(before_setup)
     end
   end
 

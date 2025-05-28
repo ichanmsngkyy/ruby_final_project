@@ -5,29 +5,31 @@ class Knight < Piece
   attr_reader :has_moved
 
   def initialize(position, is_white)
-    @moveset = [
-      [1, 2], [1, -2], [-1, 2], [-1, -2],
-      [2, 1], [2, -1], [-2, 1], [-2, -1]
-    ]
     @has_moved = false
     @color = is_white ? 'white' : 'black'
     @icon = is_white ? '♘' : '♞'
-    super(position, is_white, icon)
+    super(position, is_white, @icon)
   end
 
   def valid_move?(end_pos, board)
-    return false unless knight_move(end_pos)
+    knight_move?(end_pos) && destination_valid?(end_pos, board)
+  end
 
-    dest_piece = board[end_pos[0]][end_pos[1]]
-    return false if dest_piece && dest_piece.color == color
-
-    true
+  def move_to(new_pos)
+    @position = new_pos
+    mark_moved!
   end
 
   private
 
-  def knight_move(end_pos)
-    (end_pos[0] - x).abs == 2 && (end_pos[1] - y).abs == 1 ||
-      (end_pos[0] - x).abs == 1 && (end_pos[1] - y).abs == 2
+  def knight_move?(end_pos)
+    @moveset.any? do |dx, dy|
+      x + dx == end_pos[0] && y + dy == end_pos[1]
+    end
+  end
+
+  def destination_valid?(end_pos, board)
+    dest_piece = board[end_pos[0]][end_pos[1]]
+    dest_piece.nil? || dest_piece.color != color
   end
 end
