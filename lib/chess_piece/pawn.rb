@@ -5,36 +5,34 @@ class Pawn < Piece
   attr_reader :has_moved, :double_stepped
 
   def initialize(position, is_white)
-    @color = is_white ? 'white' : 'black'
     @icon = is_white ? '♙' : '♟'
-    @position = position
-    @has_moved = false
     @double_stepped = false
     super(position, is_white, @icon)
   end
 
-  def move_to(new_pos)
-    @position = new_pos
-    mark_moved!
-    @double_stepped = ((new_pos[0] - x).abs == 2)
+  def valid_move?(end_pos, board)
+    return false unless on_board?(end_pos)
+
+    pawn_move?(end_pos, board)
   end
 
-  def valid_move?(end_pos, board)
-    pawn_move?(end_pos, board)
+  def move_to(new_pos)
+    old_pos = @position.dup
+    super(new_pos)
+
+    # Check if this was a double step
+    @double_stepped = (new_pos[0] - old_pos[0]).abs == 2
   end
 
   private
 
-  def promotion_row?
-    (color == 'white' && x.zero?) || (color == 'black' && x == 7)
-  end
-
   def direction
+    # White pawns move from row 6 to row 0, black pawns move from row 1 to row 7
     color == 'white' ? -1 : 1
   end
 
   def pawn_move?(end_pos, board)
-    on_board?(end_pos) && (forward_move?(end_pos, board) || diagonal_move?(end_pos, board))
+    forward_move?(end_pos, board) || diagonal_capture?(end_pos, board)
   end
 
   def forward_move?(end_pos, board)
@@ -42,31 +40,57 @@ class Pawn < Piece
     dy = end_pos[1] - y
     dir = direction
 
-    dest_piece = board[end_pos[0]][end_pos[1]]
-
+    # Must move forward only (no sideways movement)
     return false unless dy.zero?
 
+    dest_piece = board[end_pos]
+
+    # Single step forward
     return true if dx == dir && dest_piece.nil?
 
+    # Double step forward (only if haven't moved and path is clear)
     if dx == 2 * dir && !has_moved
-      mid_x = x + dir
-      return board[mid_x][y].nil? && dest_piece.nil?
+      mid_pos = [x + dir, y]
+      return board[mid_pos].nil? && dest_piece.nil?
     end
 
     false
   end
 
-  def diagonal_move?(end_pos, board)
+  def diagonal_capture?(end_pos, board)
     dx = end_pos[0] - x
     dy = end_pos[1] - y
     dir = direction
 
-    dest_piece = board[end_pos[0]][end_pos[1]]
+    # Must be diagonal move (one forward, one sideways)
+    return false unless dx == dir && dy.abs == 1
 
-    dx == dir && dy.abs == 1 && dest_piece && dest_piece.color != color
+    dest_piece = board[end_pos]
+
+    # Regular capture
+    return true if dest_piece && dest_piece.color != color
+
+    # En passant capture (destination is empty but we're capturing)
+    return en_passant_possible?(end_pos, board) if dest_piece.nil?
+
+    false
   end
 
-  def set_double_stepped(value)
-    @double_stepped = value
+  def en_passant_possible?(end_pos, board)
+    # Check if there's an enemy pawn beside us that just double-stepped
+    enemy_pawn_pos = [x, end_pos[1]]
+    enemy_pawn = board[enemy_pawn_pos]
+
+    return false unless enemy_pawn.is_a?(Pawn)
+    return false unless enemy_pawn.color != color
+    return false unless enemy_pawn.double_stepped
+
+    # Check if it was the last move
+    last_move = board.last_move
+    return false unless last_move
+    return false unless last_move[:piece] == enemy_pawn
+
+    # Verify it was indeed a double step
+    (last_move[:start_pos][0] - last_move[:end_pos][0]).abs == 2
   end
 end

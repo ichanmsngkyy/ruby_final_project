@@ -25,10 +25,10 @@ describe Board do
 
     it 'places pieces in correct starting positions' do
       expect(board.instance_variable_get(:@grid)[0][0]).to be_a(Rook)
-      expect(board.instance_variable_get(:@grid)[0][0].color).to be('white')
+      expect(board.instance_variable_get(:@grid)[0][0].color).to be('black')
 
       expect(board.instance_variable_get(:@grid)[7][0]).to be_a(Rook)
-      expect(board.instance_variable_get(:@grid)[7][0].color).to be('black')
+      expect(board.instance_variable_get(:@grid)[7][0].color).to be('white')
     end
 
     it 'sets up pawns correctly' do
@@ -68,16 +68,15 @@ describe Board do
 
       expected_output = <<~BOARD
            A   B   C   D   E   F   G   H
-        8 | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |#{' '}
-        7 | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ |#{' '}
+        8 | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |#{' '}
+        7 | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |#{' '}
         6 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
         5 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
         4 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
         3 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        2 | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |#{' '}
-        1 | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |#{' '}
+        2 | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ |#{' '}
+        1 | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |#{' '}
       BOARD
-
       expect { board.display_board }.to output(expected_output).to_stdout
     end
   end
