@@ -16,7 +16,7 @@ class King < Piece
     super(position, is_white, @icon)
   end
 
-  def can_castle?(rook, board)
+  def can_castle?(rook, board) # rubocop:disable Metrics/PerceivedComplexity
     return false unless rook.is_a?(Rook) && !rook.has_moved && !@has_moved
 
     row = @color == 'white' ? 7 : 0
@@ -68,8 +68,8 @@ class King < Piece
   def in_check?(board)
     king_pos = [x, y]
 
-    board.each_with_index do |row, i|
-      row.each_with_index do |piece, j|
+    board.each_with_index do |row, _i|
+      row.each_with_index do |piece, _j|
         next if piece.nil? || piece.color == color || piece.is_a?(King)
 
         return true if piece.valid_move?(king_pos, board)
@@ -83,8 +83,8 @@ class King < Piece
   end
 
   def square_attacked?(pos, board)
-    board.each_with_index do |row, i|
-      row.each_with_index do |piece, j|
+    board.each_with_index do |row, _i|
+      row.each_with_index do |piece, _j|
         next if piece.nil? || piece.color == color
 
         return true if piece.valid_move?(pos, board)

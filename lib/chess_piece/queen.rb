@@ -42,7 +42,7 @@ class Queen < Piece
     curr_x = x + step_x
     curr_y = y + step_y
 
-    while [curr_x, curr_y] != end_pos
+    while end_pos != [curr_x, curr_y]
       return false unless board[curr_x][curr_y].nil?
 
       curr_x += step_x

@@ -26,7 +26,7 @@ class Pawn < Piece
   private
 
   def promotion_row?
-    (color == 'white' && x == 0) || (color == 'black' && x == 7)
+    (color == 'white' && x.zero?) || (color == 'black' && x == 7)
   end
 
   def direction

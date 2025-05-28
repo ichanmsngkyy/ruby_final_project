@@ -134,7 +134,7 @@ class Board
   end
 
   def promotion_row?(pawn)
-    (pawn.color == 'white' && pawn.position[0] == 0) ||
+    (pawn.color == 'white' && pawn.position[0].zero?) ||
       (pawn.color == 'black' && pawn.position[0] == 7)
   end
 
