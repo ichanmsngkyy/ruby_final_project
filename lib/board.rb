@@ -121,7 +121,7 @@ class Board
     dx = end_pos[0] - king.position[0]
     dy = end_pos[1] - king.position[1]
 
-    dx == 0 && dy.abs == 2
+    dx.zero? && dy.abs == 2
   end
 
   def perform_castling(king, end_pos)
@@ -184,7 +184,7 @@ class Board
   end
 
   def promotion_row?(pawn)
-    (pawn.color == 'white' && pawn.position[0] == 0) ||
+    (pawn.color == 'white' && pawn.position[0].zero?) ||
       (pawn.color == 'black' && pawn.position[0] == 7)
   end
 

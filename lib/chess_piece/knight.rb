@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Knight < Piece
   def initialize(position, is_white)
     @icon = is_white ? '♘' : '♞'

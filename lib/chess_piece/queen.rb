@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Queen < Piece
   def initialize(position, is_white)
     @icon = is_white ? '♕' : '♛'
@@ -20,6 +22,6 @@ class Queen < Piece
     dy = (end_pos[1] - y).abs
 
     # Horizontal, vertical, or diagonal movement
-    (dx == 0 && dy > 0) || (dy == 0 && dx > 0) || (dx == dy && dx > 0)
+    (dx.zero? && dy.positive?) || (dy.zero? && dx.positive?) || (dx == dy && dx.positive?)
   end
 end

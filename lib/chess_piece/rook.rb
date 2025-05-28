@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Rook < Piece
   def initialize(position, is_white)
     @icon = is_white ? '♖' : '♜'
@@ -18,6 +20,6 @@ class Rook < Piece
     # Rook moves horizontally or vertically only
     dx = (end_pos[0] - x).abs
     dy = (end_pos[1] - y).abs
-    (dx == 0 && dy > 0) || (dy == 0 && dx > 0)
+    (dx.zero? && dy.positive?) || (dy.zero? && dx.positive?)
   end
 end

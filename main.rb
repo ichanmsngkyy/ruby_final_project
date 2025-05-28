@@ -33,8 +33,6 @@ class Main
     end
   end
 
-  private
-
   def self.start_human_game
     puts 'Enter Player 1 name (White):'
     player1_name = gets.chomp

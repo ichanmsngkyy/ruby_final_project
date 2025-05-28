@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Bishop < Piece
   def initialize(position, is_white)
     @icon = is_white ? '♗' : '♝'
@@ -18,6 +20,6 @@ class Bishop < Piece
     # Bishop moves diagonally only
     dx = (end_pos[0] - x).abs
     dy = (end_pos[1] - y).abs
-    dx == dy && dx > 0
+    dx == dy && dx.positive?
   end
 end

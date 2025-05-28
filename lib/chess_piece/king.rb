@@ -29,7 +29,7 @@ class King < Piece
     # King moves exactly 2 squares horizontally, no vertical movement
     dx = end_pos[0] - x
     dy = end_pos[1] - y
-    dx == 0 && dy.abs == 2
+    dx.zero? && dy.abs == 2
   end
 
   def can_castle?(end_pos, board)
@@ -80,7 +80,7 @@ class King < Piece
           piece_pos = [row_idx, col_idx]
           dx = (pos[0] - piece_pos[0]).abs
           dy = (pos[1] - piece_pos[1]).abs
-          return true if dx <= 1 && dy <= 1 && (dx + dy > 0)
+          return true if dx <= 1 && dy <= 1 && (dx + dy).positive?
         elsif piece.valid_move?(pos, board)
           # For other pieces, use their valid_move? method
           # but create a temporary board state to avoid recursion
