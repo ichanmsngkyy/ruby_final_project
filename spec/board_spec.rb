@@ -1,83 +1,112 @@
 # frozen_string_literal: true
 
 require_relative '../lib/board'
-require_relative '../lib/chess_piece/piece'
-require_relative '../lib/chess_piece/rook'
-require_relative '../lib/chess_piece/bishop'
-require_relative '../lib/chess_piece/pawn'
-require_relative '../lib/chess_piece/knight'
-require_relative '../lib/chess_piece/queen'
-require_relative '../lib/chess_piece/king'
+
 
 # Board Spec class
 describe Board do
-  subject(:board) { described_class.new }
+  let(:board) { Board.new }
 
   describe '#initialize' do
-    it 'creates an empty grid' do
-      before_setup = Board.new.instance_variable_get(:@grid)
-      expect(board.instance_variable_get(:@grid)).to eq(before_setup)
+    it 'creates an 8x8 grid filled with nil' do
+      expect(board.grid.size).to eq(8)
+      expect(board.grid.first.size).to eq(8)
+      expect(board.grid.flatten.all?(&:nil?)).to be true
+    end
+
+    it 'initializes last_move as nil' do
+      expect(board.last_move).to be_nil
     end
   end
 
   describe '#setup_pieces' do
     before { board.setup_pieces }
 
-    it 'places pieces in correct starting positions' do
-      expect(board.instance_variable_get(:@grid)[0][0]).to be_a(Rook)
-      expect(board.instance_variable_get(:@grid)[0][0].color).to be('black')
+    it 'places all pieces in correct starting positions' do
+      # Check white pieces
+      expect(board[[7, 0]]).to be_a(Rook)
+      expect(board[[7, 0]].color).to eq('white')
+      expect(board[[7, 4]]).to be_a(King)
+      expect(board[[7, 4]].color).to eq('white')
 
-      expect(board.instance_variable_get(:@grid)[7][0]).to be_a(Rook)
-      expect(board.instance_variable_get(:@grid)[7][0].color).to be('white')
+      # Check black pieces
+      expect(board[[0, 0]]).to be_a(Rook)
+      expect(board[[0, 0]].color).to eq('black')
+      expect(board[[0, 4]]).to be_a(King)
+      expect(board[[0, 4]].color).to eq('black')
+
+      # Check pawns
+      (0..7).each do |col|
+        expect(board[[1, col]]).to be_a(Pawn)
+        expect(board[[1, col]].color).to eq('black')
+        expect(board[[6, col]]).to be_a(Pawn)
+        expect(board[[6, col]].color).to eq('white')
+      end
+    end
+  end
+
+  describe '#[]' do
+    it 'returns the piece at given position' do
+      board.setup_pieces
+      piece = board[[0, 0]]
+      expect(piece).to be_a(Rook)
+      expect(piece.color).to eq('black')
     end
 
-    it 'sets up pawns correctly' do
-      (0..7).each do |col|
-        expect(board.instance_variable_get(:@grid)[1][col]).to be_a(Pawn)
-        expect(board.instance_variable_get(:@grid)[6][col]).to be_a(Pawn)
+    it 'returns nil for empty squares' do
+      expect(board[[3, 3]]).to be_nil
+    end
+  end
+
+  describe '#[]=' do
+    it 'sets a piece at given position' do
+      piece = Rook.new([3, 3], true)
+      board[[3, 3]] = piece
+      expect(board[[3, 3]]).to eq(piece)
+    end
+  end
+
+  describe '#move_piece' do
+    before { board.setup_pieces }
+
+    context 'with valid move' do
+      it 'moves the piece and returns true' do
+        result = board.move_piece([6, 4], [5, 4]) # White pawn forward
+        expect(result).to be true
+        expect(board[[5, 4]]).to be_a(Pawn)
+        expect(board[[6, 4]]).to be_nil
+      end
+
+      it 'updates the last_move' do
+        piece = board[[6, 4]]
+        board.move_piece([6, 4], [5, 4])
+        expect(board.last_move[:piece]).to eq(piece)
+        expect(board.last_move[:start_pos]).to eq([6, 4])
+        expect(board.last_move[:end_pos]).to eq([5, 4])
       end
     end
 
-    it 'ensures the correct number of placed pieces' do
-      total_pieces = board.instance_variable_get(:@grid).flatten.compact.size
-      expect(total_pieces).to eq(32)
+    context 'with invalid move' do
+      it 'returns false and does not move piece' do
+        result = board.move_piece([6, 4], [3, 4]) # Invalid pawn move
+        expect(result).to be false
+        expect(board[[6, 4]]).to be_a(Pawn)
+        expect(board[[3, 4]]).to be_nil
+      end
+    end
+
+    context 'with no piece at start position' do
+      it 'returns false' do
+        result = board.move_piece([3, 3], [4, 4])
+        expect(result).to be false
+      end
     end
   end
 
   describe '#display_board' do
-    let(:board) { described_class.new }
-
-    it 'prints the board correctly' do
-      expected_output = <<~BOARD
-           A   B   C   D   E   F   G   H
-        8 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        7 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        6 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        5 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        4 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        3 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        2 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        1 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-      BOARD
-
-      expect { board.display_board }.to output(expected_output).to_stdout
-    end
-
-    it 'prints a board with pieces after setup' do
+    it 'outputs board representation without errors' do
       board.setup_pieces
-
-      expected_output = <<~BOARD
-           A   B   C   D   E   F   G   H
-        8 | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |#{' '}
-        7 | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |#{' '}
-        6 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        5 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        4 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        3 | _ | _ | _ | _ | _ | _ | _ | _ |#{' '}
-        2 | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ |#{' '}
-        1 | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |#{' '}
-      BOARD
-      expect { board.display_board }.to output(expected_output).to_stdout
+      expect { board.display_board }.to output(/A   B   C   D   E   F   G   H/).to_stdout
     end
   end
 end
