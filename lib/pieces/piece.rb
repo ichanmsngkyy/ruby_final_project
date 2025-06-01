@@ -38,14 +38,14 @@ class Piece
 
   # Checking if the path is clear
   def clear_path?(end_pos, board)
-    dx = end_pos[0] - x
-    dy = end_pos[1] - y
+    dx = end_pos[0] - position[0] # Changed from 'x' to 'position[0]'
+    dy = end_pos[1] - position[1]  # Changed from 'y' to 'position[1]'
 
     step_x = dx.zero? ? 0 : dx / dx.abs
     step_y = dy.zero? ? 0 : dy / dy.abs
 
-    curr_x = x + step_x
-    curr_y = y + step_y
+    curr_x = position[0] + step_x  # Changed from 'x' to 'position[0]'
+    curr_y = position[1] + step_y  # Changed from 'y' to 'position[1]'
 
     while curr_x != end_pos[0] || curr_y != end_pos[1]
       return false unless board[[curr_x, curr_y]].nil?

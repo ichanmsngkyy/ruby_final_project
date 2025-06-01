@@ -30,55 +30,55 @@ describe Rook do
 
   describe '#valid_move?' do
     context 'when the move is off the board' do
-      it 'return false' do
+      it 'returns false' do
         expect(rook.valid_move?([8, 0], board)).to be false
       end
     end
 
     context 'when the move is on the board' do
-      it 'return true' do
+      it 'returns true' do
         expect(rook.valid_move?([7, 0], board)).to be true
       end
     end
 
     context 'when the move is invalid rook movement' do
-      it 'return false' do
+      it 'returns false' do
         expect(rook.valid_move?([4, 3], board)).to be false
       end
     end
 
     context 'when the move is valid rook movement' do
-      it 'return true' do
+      it 'returns true' do
         expect(rook.valid_move?([1, 0], board)).to be true
       end
     end
 
     context 'when path is not clear' do
-      it 'return false' do
+      it 'returns false' do
         board = Hash.new(nil)
         board[[1, 0]] = double('Piece')
-        expect(rook.clear_path?([2, 0], board)).to be false
+        expect(rook.valid_move?([2, 0], board)).to be false
       end
     end
 
     context 'when  path is clear' do
-      it 'return true' do
-        expect(rook.clear_path?([2, 0], board)).to be true
+      it 'returns true' do
+        expect(rook.valid_move?([2, 0], board)).to be true
       end
     end
 
     context 'when destination is not valid' do
-      it 'return false' do
+      it 'returns false' do
         friendly_piece = Piece.new([0, 0], true, '♖')
         board = { [0, 3] => friendly_piece }
-        expect(rook.destination_valid?([0, 3], board)).to be false
+        expect(rook.valid_move?([0, 3], board)).to be false
       end
     end
 
     context 'when the destination is valid' do
-      it 'return true' do
+      it 'returns true' do
         board = {}
-        expect(rook.destination_valid?([2, 0], board)).to be true
+        expect(rook.valid_move?([2, 0], board)).to be true
       end
     end
   end
