@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
+require_relative 'piece'
+
 # Bishop Class
-# Inherits of Piece
 class Bishop < Piece
   attr_reader :position, :icon
 
@@ -14,7 +15,7 @@ class Bishop < Piece
   def valid_move?(end_pos, board)
     return false unless on_board?(end_pos)
     return false unless bishop_move(end_pos)
-    return false unless clear_path?(end_pos)
+    return false unless clear_path?(end_pos, board)
 
     destination_valid?(end_pos, board)
   end
