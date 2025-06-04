@@ -115,7 +115,7 @@ class Board
     (0..7).each do |row|
       (0..7).each do |col|
         piece = @grid[row][col]
-        return [row, col] if piece && piece.is_a?(King) && piece.color == color
+        return [row, col] if piece.is_a?(King) && piece.color == color
       end
     end
     nil
@@ -126,7 +126,7 @@ class Board
     col = side == 'kingside' ? 7 : 0
 
     piece = @grid[row][col]
-    return [row, col] if piece && piece.is_a?(Rook) && piece.color == color
+    return [row, col] if piece.is_a?(Rook) && piece.color == color
 
     nil
   end
@@ -144,7 +144,7 @@ class Board
       (0..7).each do |col|
         piece = @grid[row][col]
 
-        next if piece.nil || piece.color != color
+        next if piece.nil? || piece.color != color
 
         return true if piece.valid_move?(position, self)
       end
@@ -154,10 +154,10 @@ class Board
 
   def get_castle_path(color, side)
     king_position = find_king(color)
-    rook_position = find_rook(color, side)
+    find_rook(color, side)
     return false if king_position.nil?
 
-    opponent_color = color == 'white' ? 'black' : 'white'
+    color == 'white' ? 'black' : 'white'
 
     if side == 'kingside'
       if color == 'white'
