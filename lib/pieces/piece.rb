@@ -2,7 +2,6 @@
 
 # frozen_string_literal : true
 
-require_relative '../board'
 # Piece superclass
 class Piece
   attr_accessor :position, :has_moved

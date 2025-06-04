@@ -58,19 +58,19 @@ class Board
 
   def []=(position, piece)
     row, col = position
-    piece[row][col]
+    @grid[row][col] = piece
   end
 
   def move_piece(start_pos, end_pos)
-    piece = [start_pos][end_pos]
+    piece = self[start_pos]
 
     return false if piece.nil?
     return false unless piece.valid_move?(end_pos, self)
 
     self[start_pos] = nil
     self[end_pos] = piece
-    piece.position = piece
-    piece.has_moved!
+    piece.position = end_pos
+    piece.mark_moved!
 
     true
   end
@@ -87,18 +87,26 @@ class Board
 
     return false if king.has_moved || rook.has_moved
 
-    square_between = get_castle_path(color, side)
+    squares_between = get_castle_path(color, side)
     squares_between.each do |square|
       return false unless self[square].nil?
     end
 
     return false if in_check?(color)
 
+    opponent_color = color == 'white' ? 'black' : 'white'
+    final_king_position = if side == 'kingside'
+                            (color == 'white' ? [0, 6] : [7, 6])
+                          else
+                            (color == 'white' ? [0, 2] : [7, 2])
+                          end
     path_squares = get_king_castle_path(color, side) # You need this helper
     path_squares.each do |square|
       return false if square_under_attack?(square, opponent_color)
     end
-    false if square_under_attack?(final_king_position, opponent_color)
+    return false if square_under_attack?(final_king_position, opponent_color)
+
+    true
   end
 
   private
@@ -106,6 +114,7 @@ class Board
   def find_king(color)
     (0..7).each do |row|
       (0..7).each do |col|
+        piece = @grid[row][col]
         return [row, col] if piece && piece.is_a?(King) && piece.color == color
       end
     end
@@ -113,11 +122,12 @@ class Board
   end
 
   def find_rook(color, side)
-    (0..7).each do |row|
-      (0..7).each do |col|
-        return [row, col] if piece && piece.is_a?(Rook) && piece.color == color
-      end
-    end
+    row = color == 'white' ? 0 : 7
+    col = side == 'kingside' ? 7 : 0
+
+    piece = @grid[row][col]
+    return [row, col] if piece && piece.is_a?(Rook) && piece.color == color
+
     nil
   end
 
@@ -143,5 +153,28 @@ class Board
   end
 
   def get_castle_path(color, side)
+    king_position = find_king(color)
+    rook_position = find_rook(color, side)
+    return false if king_position.nil?
+
+    opponent_color = color == 'white' ? 'black' : 'white'
+
+    if side == 'kingside'
+      if color == 'white'
+        [[0, 5], [0, 6]]
+      else
+        [[7, 5], [7, 6]]
+      end
+    elsif side == 'queenside'
+      if color == 'white'
+        [[0, 3], [0, 2]]
+      else
+        [[7, 3], [7, 2]]
+      end
+    end
+  end
+
+  def get_king_castle_path(color, side)
+    get_castle_path(color, side)
   end
 end
