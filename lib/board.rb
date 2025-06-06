@@ -72,7 +72,50 @@ class Board
     piece.position = end_pos
     piece.mark_moved!
 
+    # Check for pawn promotion after the move
+    handle_pawn_promotion(end_pos) if piece.is_a?(Pawn)
+
     true
+  end
+
+  # Check if pawn has reached promotion rank
+  def pawn_promotion_needed?(position)
+    piece = self[position]
+    return false unless piece.is_a?(Pawn)
+
+    row = position[0]
+    # White pawns promote on row 7, black pawns on row 0
+    promotion_rank = piece.color == 'white' ? 7 : 0
+    row == promotion_rank
+  end
+
+  # Handle pawn promotion - returns true if promotion occurred
+  def handle_pawn_promotion(position)
+    return false unless pawn_promotion_needed?(position)
+
+    # For now, auto-promote to queen
+    # You can modify this to ask for player input
+    promote_pawn(position, 'queen')
+    true
+  end
+
+  # Promote pawn to specified piece type
+  def promote_pawn(position, piece_type = 'queen')
+    current_piece = self[position]
+    return false unless current_piece.is_a?(Pawn)
+
+    # Create new piece based on selection
+    new_piece = create_promoted_piece(position, current_piece.color, piece_type)
+
+    # Replace pawn with new piece on board
+    self[position] = new_piece
+
+    true
+  end
+
+  # Get available promotion choices
+  def valid_promotion_pieces
+    %w[queen rook bishop knight]
   end
 
   def can_castle?(color, side)
@@ -109,7 +152,31 @@ class Board
     true
   end
 
+  def in_check?(color)
+    king_position = find_king(color)
+    return false if king_position.nil?
+
+    opponent_color = color == 'white' ? 'black' : 'white'
+    square_under_attack?(king_position, opponent_color)
+  end
+
   private
+
+  def create_promoted_piece(position, color, piece_type)
+    is_white = color == 'white'
+    case piece_type.downcase
+    when 'queen'
+      Queen.new(position, is_white)
+    when 'rook'
+      Rook.new(position, is_white)
+    when 'bishop'
+      Bishop.new(position, is_white)
+    when 'knight'
+      Knight.new(position, is_white)
+    else
+      Queen.new(position, is_white) # default to queen
+    end
+  end
 
   def find_king(color)
     (0..7).each do |row|
@@ -129,14 +196,6 @@ class Board
     return [row, col] if piece.is_a?(Rook) && piece.color == color
 
     nil
-  end
-
-  def in_check?(color)
-    king_position = find_king(color)
-    return false if king_position.nil?
-
-    opponent_color = color == 'white' ? 'black' : 'white'
-    square_under_attack?(king_position, opponent_color)
   end
 
   def square_under_attack?(position, color)
