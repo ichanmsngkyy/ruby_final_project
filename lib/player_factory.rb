@@ -12,23 +12,25 @@ class PlayerFactory
 
   def self.setup_game_players
     puts '=== Chess Game Setup ==='
-    puts '1. Human vs Human'
-    puts '2. Human vs AI'
-    puts '3. AI vs AI'
-    print 'Choose game mode (1-3): '
 
-    mode = gets.chomp.to_i
+    loop do
+      puts '1. Human vs Human'
+      puts '2. Human vs AI'
+      puts '3. AI vs AI'
+      print 'Choose game mode (1-3): '
 
-    case mode
-    when 1
-      setup_human_vs_human
-    when 2
-      setup_human_vs_ai
-    when 3
-      setup_ai_vs_ai
-    else
-      puts 'Invalid choice. Setting up Human vs Human...'
-      setup_human_vs_human
+      mode = gets.chomp.to_i
+
+      case mode
+      when 1
+        return setup_human_vs_human
+      when 2
+        return setup_human_vs_ai
+      when 3
+        return setup_ai_vs_ai
+      else
+        puts 'Invalid choice. Please enter 1, 2, or 3.'
+      end
     end
   end
 

@@ -6,7 +6,7 @@ require_relative 'lib/game'
 class Main
   def self.run
     game = Game.new
-    game.play
+    game.show_main_menu
   end
 end
 

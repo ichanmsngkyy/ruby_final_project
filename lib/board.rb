@@ -61,6 +61,31 @@ class Board
     @grid[row][col] = piece
   end
 
+  def display
+    puts '    a b c d e f g h'
+    puts '  ┌─────────────────┐'
+
+    # Display from row 7 to 0 (black pieces at top, white at bottom)
+    (0..7).reverse_each do |row|
+      print "#{row + 1} │"
+
+      (0..7).each do |col|
+        piece = @grid[row][col]
+        if piece
+          print " #{piece_symbol(piece)}"
+        else
+          print ' ·'
+        end
+      end
+
+      puts " │ #{row + 1}"
+    end
+
+    puts '  └─────────────────┘'
+    puts '    a b c d e f g h'
+    puts
+  end
+
   def move_piece(start_pos, end_pos)
     piece = self[start_pos]
 
@@ -162,20 +187,19 @@ class Board
 
   private
 
-  def create_promoted_piece(position, color, piece_type)
-    is_white = color == 'white'
-    case piece_type.downcase
-    when 'queen'
-      Queen.new(position, is_white)
-    when 'rook'
-      Rook.new(position, is_white)
-    when 'bishop'
-      Bishop.new(position, is_white)
-    when 'knight'
-      Knight.new(position, is_white)
-    else
-      Queen.new(position, is_white) # default to queen
-    end
+  def piece_symbol(piece)
+    symbols = {
+      'Pawn' => { 'white' => '♙', 'black' => '♟' },
+      'Rook' => { 'white' => '♖', 'black' => '♜' },
+      'Knight' => { 'white' => '♘', 'black' => '♞' },
+      'Bishop' => { 'white' => '♗', 'black' => '♝' },
+      'Queen' => { 'white' => '♕', 'black' => '♛' },
+      'King' => { 'white' => '♔', 'black' => '♚' }
+    }
+
+    piece_type = piece.class.name
+    color = piece.color
+    symbols[piece_type][color] || '?'
   end
 
   def find_king(color)
@@ -212,12 +236,6 @@ class Board
   end
 
   def get_castle_path(color, side)
-    king_position = find_king(color)
-    find_rook(color, side)
-    return false if king_position.nil?
-
-    color == 'white' ? 'black' : 'white'
-
     if side == 'kingside'
       if color == 'white'
         [[0, 5], [0, 6]]
@@ -226,14 +244,32 @@ class Board
       end
     elsif side == 'queenside'
       if color == 'white'
-        [[0, 3], [0, 2]]
+        [[0, 3], [0, 2], [0, 1]]  # Include the square next to the rook
       else
-        [[7, 3], [7, 2]]
+        [[7, 3], [7, 2], [7, 1]]  # Include the square next to the rook
       end
+    else
+      []
     end
   end
 
   def get_king_castle_path(color, side)
     get_castle_path(color, side)
+  end
+
+  def create_promoted_piece(position, color, piece_type)
+    is_white = color == 'white'
+    case piece_type.downcase
+    when 'queen'
+      Queen.new(position, is_white)
+    when 'rook'
+      Rook.new(position, is_white)
+    when 'bishop'
+      Bishop.new(position, is_white)
+    when 'knight'
+      Knight.new(position, is_white)
+    else
+      Queen.new(position, is_white) # default to queen
+    end
   end
 end
