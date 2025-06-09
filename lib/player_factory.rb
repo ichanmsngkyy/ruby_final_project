@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# PlayerFactory Class
 class PlayerFactory
   def self.create_player(type, name, color, difficulty = :easy)
     case type
@@ -33,8 +36,6 @@ class PlayerFactory
       end
     end
   end
-
-  private
 
   def self.setup_human_vs_human
     print 'Enter Player 1 (White) name: '
